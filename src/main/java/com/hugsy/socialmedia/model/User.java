@@ -1,8 +1,20 @@
 package com.hugsy.socialmedia.model;
 
+import com.hugsy.customorm.annotation.Column;
+import com.hugsy.customorm.annotation.Id;
+import com.hugsy.customorm.annotation.Table;
+
+@Table(name = "user_tbl")
 public class User {
+    @Id
+    @Column(name = "id", unique = true, nullable = false)
     private Long id;
+
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
+
+    @Column(name = "name", nullable = false)
+    private String name;
 
     public Long getId() {
         return id;
@@ -27,6 +39,4 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
-    private String name;
 }
