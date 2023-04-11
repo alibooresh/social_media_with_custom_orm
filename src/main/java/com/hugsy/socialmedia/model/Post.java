@@ -10,13 +10,13 @@ public class Post {
     @Id
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
-    @Column(name = "caption", nullable = false)
+    @Column(name = "caption", nullable = false, length = 500)
     private String caption;
     @Column(name = "media_url", nullable = false)
     private String mediaUrl;
     @ManyToOne(targetEntity = User.class)
     @Column(name = "user_id", nullable = false)
-    private User user;
+    private Long userId;
 
     public Long getId() {
         return id;
@@ -42,11 +42,11 @@ public class Post {
         this.mediaUrl = mediaUrl;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

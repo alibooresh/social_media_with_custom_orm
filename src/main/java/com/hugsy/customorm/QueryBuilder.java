@@ -2,23 +2,23 @@ package com.hugsy.customorm;
 
 import com.hugsy.customorm.annotation.Column;
 import com.hugsy.customorm.annotation.Table;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
 public class QueryBuilder {
-    public static String createTable(@NotNull Class<?> aClass) {
-        String query = "create table " + aClass.getAnnotation(Table.class).name() + "(";
-        if (aClass.getFields().length > 0) {
-            for (Field field : aClass.getFields()) {
+    public static String createTable(Class<?> c) {
+        String query = "create table " + c.getAnnotation(Table.class).name() + "(";
+        if (c.getDeclaredFields().length > 0) {
+            for (Field field : c.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Column.class)) {
                     String columnInfo = field.getAnnotation(Column.class).name() + " " +
                             getType(field);
-                    query = query + " " + columnInfo;
+                    query = query + columnInfo+",";
+
                 }
             }
         }
-        return query + ")";
+        return query.toUpperCase().substring(0, query.length() - 1) + ")";
     }
 
     static String getType(Field field) {
