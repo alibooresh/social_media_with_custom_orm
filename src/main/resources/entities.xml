@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="http://www.ali.com/orm"
+          xsi:schemaLocation="http://www.ali.com/orm entities.xsd">
+    <entity table="user" entityClass="com.hugsy.socialmedia.model.User">
+        <id name="id" type="java.lang.Long"/>
+        <columns>
+            <column name="name" type="java.lang.String"/>
+            <column name="username" type="java.lang.String" unique="true" length="50" nullable="false"/>
+        </columns>
+    </entity>
+    <entity table="post_tbl" entityClass="com.hugsy.socialmedia.model.Post">
+        <id name="id" type="java.lang.Long"/>
+        <columns>
+            <column name="caption" type="java.lang.String" unique="false" nullable="false" length="500"/>
+            <column name="media_url" type="java.lang.String" unique="false" nullable="false" length="1000"/>
+        </columns>
+    </entity>
+</entities>

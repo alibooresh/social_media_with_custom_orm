@@ -1,6 +1,8 @@
 package com.hugsy.customorm;
 
 import com.hugsy.customorm.annotation.Column;
+import com.hugsy.customorm.annotation.Id;
+import com.hugsy.customorm.annotation.ManyToOne;
 import com.hugsy.customorm.annotation.Table;
 
 import java.lang.reflect.Field;
@@ -10,15 +12,28 @@ public class QueryBuilder {
         String query = "create table " + c.getAnnotation(Table.class).name() + "(";
         if (c.getDeclaredFields().length > 0) {
             for (Field field : c.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Column.class)) {
-                    String columnInfo = field.getAnnotation(Column.class).name() + " " +
-                            getType(field);
-                    query = query + columnInfo+",";
-
+                String columnInfo = "";
+                if (field.isAnnotationPresent(Id.class)) {
+                    columnInfo = field.getAnnotation(Column.class).name() + " " +
+                            getType(field) + (field.getAnnotation(Column.class).nullable() ? "" : " NOT NULL ") +
+                            "PRIMARY KEY ";
+                } else if (field.isAnnotationPresent(Column.class) &&
+                        !field.isAnnotationPresent(ManyToOne.class) &&
+                        !field.isAnnotationPresent(Id.class)) {
+                    columnInfo = field.getAnnotation(Column.class).name() + " " + getType(field) +
+                            (field.getAnnotation(Column.class).nullable() ? "" : " NOT NULL ") +
+                            (field.getAnnotation(Column.class).unique() ? " UNIQUE " : "");
+                } else if (field.isAnnotationPresent(ManyToOne.class)) {
+                    columnInfo = field.getAnnotation(Column.class).name() + " " + getType(field) +
+                            (field.getAnnotation(Column.class).nullable() ? "" : " NOT NULL ") +
+                            (field.getAnnotation(Column.class).unique() ? " UNIQUE " : "") + " FOREIGN KEY REFERENCES " +
+                            field.getAnnotation(ManyToOne.class).targetTable() +
+                            " (" + field.getAnnotation(ManyToOne.class).referenceColumn() + ")";
                 }
+                query = query + columnInfo + ",";
             }
         }
-        return query.toUpperCase().substring(0, query.length() - 1) + ")";
+        return query.substring(0, query.length() - 1) + ")";
     }
 
     static String getType(Field field) {

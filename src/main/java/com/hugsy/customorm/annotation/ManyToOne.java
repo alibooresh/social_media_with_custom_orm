@@ -9,4 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ManyToOne {
     Class targetEntity() default void.class;
+
+    String targetTable();
+
+    String referenceColumn();
 }

@@ -14,7 +14,7 @@ public class Post {
     private String caption;
     @Column(name = "media_url", nullable = false)
     private String mediaUrl;
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne(targetTable = "user_tbl", targetEntity = User.class, referenceColumn = "id")
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
