@@ -1,6 +1,10 @@
 package com.hugsy.database;
 
+import com.hugsy.customorm.annotation.Id;
+import com.hugsy.customorm.annotation.Table;
+
 import java.sql.*;
+import java.util.Arrays;
 
 public class Database {
     private Connection connection;
@@ -49,5 +53,34 @@ public class Database {
         }
         return tExists;
     }
+
+    public ResultSet findById(Class<?> c, Long id) throws SQLException {
+        String query = "Select * from " + c.getAnnotation(Table.class).name() +
+                " where " + getIdFieldName(c) + " = " + id;
+        return statement.executeQuery(query);
+    }
+
+    public ResultSet findAll(Class<?> c) throws SQLException {
+        String query = "Select * from " + c.getAnnotation(Table.class).name();
+        return statement.executeQuery(query);
+    }
+
+    public void deleteById(Class<?> c, Long id) throws SQLException {
+        String query = "delete from " + c.getAnnotation(Table.class).name() +
+                " where " + getIdFieldName(c) + " = " + id;
+        statement.executeUpdate(query);
+    }
+
+    public void deleteByFk(Class<?> c, Long id) throws SQLException {
+        String query = "delete from " + c.getAnnotation(Table.class).name() +
+                "where " + getIdFieldName(c) + " = " + id;
+        statement.executeUpdate(query);
+    }
+
+    String getIdFieldName(Class<?> c) {
+        return Arrays.stream(c.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Id.class)).findFirst().get().getName();
+    }
+
 
 }

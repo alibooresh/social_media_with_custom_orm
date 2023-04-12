@@ -13,15 +13,10 @@ public class ProcessCustomAnnotations implements CommandLineRunner {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Database database = new Database();
         database.tableExist(User.class.getAnnotation(Table.class).name());
-        User user = new User();
-        user.setName("Jerry");
-        user.setUsername("jrr");
-        Post post = new Post();
-        post.setCaption("Test Caption");
-        post.setMediaUrl("http://ttttt");
+
         if (User.class.isAnnotationPresent(Table.class)) {
             if (!database.tableExist(User.class.getAnnotation(Table.class).name())) {
-                database.executeQuery(QueryBuilder.createTable(user.getClass()));
+                database.executeQuery(QueryBuilder.createTable(User.class));
             }
         }
         if (Post.class.isAnnotationPresent(Table.class)) {
@@ -29,6 +24,9 @@ public class ProcessCustomAnnotations implements CommandLineRunner {
                 database.executeQuery(QueryBuilder.createTable(Post.class));
             }
         }
+
+        database.findById(User.class, 1L);
+        database.deleteById(User.class, 1L);
     }
 
     @Override
