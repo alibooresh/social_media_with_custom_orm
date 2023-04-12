@@ -55,4 +55,10 @@ public class QueryBuilder {
         }
         return type;
     }
+
+    public static String findById(Class<?> aClass, Long id) {
+        String query = "SELECT * FROM " + aClass.getAnnotation(Table.class).name() +
+                " WHERE id=" + id;
+        return query;
+    }
 }

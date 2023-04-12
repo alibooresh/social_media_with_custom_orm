@@ -12,20 +12,23 @@ import java.sql.SQLException;
 public class ProcessCustomAnnotations implements CommandLineRunner {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Database database = new Database();
+        database.tableExist(User.class.getAnnotation(Table.class).name());
         User user = new User();
         user.setName("Jerry");
         user.setUsername("jrr");
         Post post = new Post();
         post.setCaption("Test Caption");
         post.setMediaUrl("http://ttttt");
-        if (user.getClass().isAnnotationPresent(Table.class)) {
-            System.out.println(user.getClass().getAnnotation(Table.class).name());
-            System.out.println(QueryBuilder.createTable(user.getClass()));
-            System.out.println(QueryBuilder.createTable(post.getClass()));
+        if (User.class.isAnnotationPresent(Table.class)) {
+            if (!database.tableExist(User.class.getAnnotation(Table.class).name())) {
+                database.executeQuery(QueryBuilder.createTable(user.getClass()));
+            }
         }
-        database.executeQuery(QueryBuilder.createTable(user.getClass()));
-        database.executeQuery(QueryBuilder.createTable(post.getClass()));
-
+        if (Post.class.isAnnotationPresent(Table.class)) {
+            if (!database.tableExist(Post.class.getAnnotation(Table.class).name())) {
+                database.executeQuery(QueryBuilder.createTable(Post.class));
+            }
+        }
     }
 
     @Override

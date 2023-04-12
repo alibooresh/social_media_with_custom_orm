@@ -35,4 +35,19 @@ public class Database {
         resultSet.next();
         return resultSet.getInt(1) != 0;
     }
+
+    public boolean tableExist(String tableName) throws SQLException {
+        boolean tExists = false;
+        try (ResultSet rs = this.connection.getMetaData().getTables(null, null, tableName, null)) {
+            while (rs.next()) {
+                String tName = rs.getString("TABLE_NAME");
+                if (tName != null && tName.equals(tableName)) {
+                    tExists = true;
+                    break;
+                }
+            }
+        }
+        return tExists;
+    }
+
 }
