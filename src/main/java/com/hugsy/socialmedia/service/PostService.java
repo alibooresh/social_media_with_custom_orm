@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostService {
-    public Post mapPostResult(ResultSet resultSet) throws SQLException {
+    public static Post mapPostResult(ResultSet resultSet) throws SQLException {
         Post post = new Post();
         while (resultSet.next()) {
             post.setId(resultSet.getLong("id"));
@@ -19,7 +19,7 @@ public class PostService {
         return post;
     }
 
-    public List<Post> mapPostsResult(ResultSet resultSet) throws SQLException {
+    public static List<Post> mapPostsResult(ResultSet resultSet) throws SQLException {
         List<Post> posts = new ArrayList<>();
         while (resultSet.next()) {
             Post post = new Post();

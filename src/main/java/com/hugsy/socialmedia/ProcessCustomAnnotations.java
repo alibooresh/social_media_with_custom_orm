@@ -25,8 +25,8 @@ public class ProcessCustomAnnotations implements CommandLineRunner {
             }
         }
 
-        database.findById(User.class, 1L);
-        database.deleteById(User.class, 1L);
+        database.findById(User.class, 1L, "id", "name", "username");
+//        database.deleteById(User.class, 1L);
     }
 
     @Override

@@ -54,8 +54,8 @@ public class Database {
         return tExists;
     }
 
-    public ResultSet findById(Class<?> c, Long id) throws SQLException {
-        String query = "Select * from " + c.getAnnotation(Table.class).name() +
+    public ResultSet findById(Class<?> c, Long id, String... fields) throws SQLException {
+        String query = "Select " + getFields(fields) + " from " + c.getAnnotation(Table.class).name() +
                 " where " + getIdFieldName(c) + " = " + id;
         return statement.executeQuery(query);
     }
@@ -80,6 +80,14 @@ public class Database {
     String getIdFieldName(Class<?> c) {
         return Arrays.stream(c.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class)).findFirst().get().getName();
+    }
+
+    String getFields(String... fields) {
+        String result = "";
+        for (String field : fields) {
+            result += field + ",";
+        }
+        return result.substring(0, result.length() - 1);
     }
 
 

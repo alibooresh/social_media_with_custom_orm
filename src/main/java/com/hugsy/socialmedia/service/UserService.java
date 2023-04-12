@@ -8,8 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
-    public User mapUserResult(ResultSet resultSet) throws SQLException {
+    public static User mapUserResult(ResultSet resultSet) throws SQLException {
         User user = new User();
+
         while (resultSet.next()) {
             user.setId(resultSet.getLong("id"));
             user.setName(resultSet.getString("name"));
@@ -18,7 +19,7 @@ public class UserService {
         return user;
     }
 
-    public List<User> mapUsersResult(ResultSet resultSet) throws SQLException {
+    public static List<User> mapUsersResult(ResultSet resultSet) throws SQLException {
         List<User> users = new ArrayList<>();
         while (resultSet.next()) {
             User user = new User();
