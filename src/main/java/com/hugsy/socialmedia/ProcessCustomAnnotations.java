@@ -6,6 +6,7 @@ import com.hugsy.database.Database;
 import com.hugsy.socialmedia.model.Post;
 import com.hugsy.socialmedia.model.User;
 import org.springframework.boot.CommandLineRunner;
+import redis.clients.jedis.Jedis;
 
 import java.sql.SQLException;
 
@@ -31,6 +32,7 @@ public class ProcessCustomAnnotations implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
+        Jedis jedis = new Jedis();
+        System.out.println("Redis connected!");
     }
 }
