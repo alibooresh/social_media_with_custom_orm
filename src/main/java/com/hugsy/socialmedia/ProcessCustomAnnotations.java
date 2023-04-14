@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class ProcessCustomAnnotations implements CommandLineRunner {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        Database database = new Database();
+        Database database = Database.getInstance();
         database.tableExist(User.class.getAnnotation(Table.class).name());
 
         if (User.class.isAnnotationPresent(Table.class)) {

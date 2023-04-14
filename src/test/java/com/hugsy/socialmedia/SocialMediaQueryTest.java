@@ -17,7 +17,7 @@ public class SocialMediaQueryTest {
 
     @Test
     public void testFindUserById() throws SQLException {
-        Database database = new Database();
+        Database database = Database.getInstance();
         User expectedUser = new User();
         expectedUser.setId(1L);
         expectedUser.setName("Jack Nicholson");
@@ -30,7 +30,7 @@ public class SocialMediaQueryTest {
 
     @Test
     void testFindAllUsers() throws SQLException {
-        Database database = new Database();
+        Database database = Database.getInstance();
         List<User> expectedUsers = new ArrayList<>();
         User user1 = new User();
         user1.setId(1L);
@@ -42,7 +42,7 @@ public class SocialMediaQueryTest {
         user2.setUsername("nic123");
         expectedUsers.add(user1);
         expectedUsers.add(user2);
-        List<User> actualUsers = UserService.mapUsersResult(database.findAll(User.class));
+        List<User> actualUsers = UserService.mapUsersResult(database.findAll(User.class, "id", "name", "username"));
         Assertions.assertEquals(expectedUsers.size(), actualUsers.size());
         actualUsers.forEach(actualUser -> {
             expectedUsers.forEach(expectedUser -> {
@@ -57,7 +57,7 @@ public class SocialMediaQueryTest {
 
     @Test
     public void testDeleteUserById() throws SQLException {
-        Database database = new Database();
+        Database database = Database.getInstance();
         Long userId = 1L;
         database.deleteByFk(Post.class, "user_id", userId);
         database.deleteById(User.class, userId);
@@ -67,7 +67,7 @@ public class SocialMediaQueryTest {
 
     @Test
     public void testFindPostById() throws SQLException {
-        Database database = new Database();
+        Database database = Database.getInstance();
         Post expectedPost = new Post();
         expectedPost.setId(1L);
         expectedPost.setCaption("Life is simple. It’s just not easy.");
@@ -82,7 +82,7 @@ public class SocialMediaQueryTest {
 
     @Test
     void testFindAllPosts() throws SQLException {
-        Database database = new Database();
+        Database database = Database.getInstance();
         List<Post> expectedPosts = new ArrayList<>();
         Post post1 = new Post();
         post1.setId(1L);
@@ -96,7 +96,38 @@ public class SocialMediaQueryTest {
         post2.setUserId(1L);
         expectedPosts.add(post1);
         expectedPosts.add(post2);
-        List<Post> actualPosts = PostService.mapPostsResult(database.findAll(Post.class));
+        List<Post> actualPosts = PostService.mapPostsResult(database.findAll(Post.class, "id", "caption", "media_url", "user_id"));
+        Assertions.assertEquals(expectedPosts.size(), actualPosts.size());
+        actualPosts.forEach(actualPost -> {
+            expectedPosts.forEach(expectedPost -> {
+                if (Objects.equals(actualPost.getId(), expectedPost.getId())) {
+                    Assertions.assertEquals(expectedPost.getId(), actualPost.getId());
+                    Assertions.assertEquals(expectedPost.getCaption(), actualPost.getCaption());
+                    Assertions.assertEquals(expectedPost.getMediaUrl(), actualPost.getMediaUrl());
+                    Assertions.assertEquals(expectedPost.getUserId(), actualPost.getUserId());
+                }
+            });
+        });
+    }
+
+
+    @Test
+    void testFindPostsByUserId() throws SQLException {
+        Database database = Database.getInstance();
+        List<Post> expectedPosts = new ArrayList<>();
+        Post post1 = new Post();
+        post1.setId(1L);
+        post1.setCaption("Life is simple. It’s just not easy.");
+        post1.setMediaUrl("http://nazdika.com/1");
+        post1.setUserId(1L);
+        Post post2 = new Post();
+        post2.setId(2L);
+        post2.setCaption("Life is too short for bad vibes.");
+        post2.setMediaUrl("http://nazdika.com/2");
+        post2.setUserId(1L);
+        expectedPosts.add(post1);
+        expectedPosts.add(post2);
+        List<Post> actualPosts = PostService.mapPostsResult(database.findByFk(Post.class, "user_id", 1L, "id", "caption", "media_url", "user_id"));
         Assertions.assertEquals(expectedPosts.size(), actualPosts.size());
         actualPosts.forEach(actualPost -> {
             expectedPosts.forEach(expectedPost -> {
@@ -112,7 +143,7 @@ public class SocialMediaQueryTest {
 
     @Test
     public void testDeletePostById() throws SQLException {
-        Database database = new Database();
+        Database database = Database.getInstance();
         database.deleteById(Post.class, 1L);
         Post post = PostService.mapPostResult(database.findById(Post.class, 1L, "id", "caption", "media_url", "user_id"));
         Assertions.assertNull(post);

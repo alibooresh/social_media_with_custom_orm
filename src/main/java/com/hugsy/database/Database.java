@@ -1,23 +1,25 @@
 package com.hugsy.database;
 
-import com.hugsy.customorm.annotation.Id;
-import com.hugsy.customorm.annotation.Table;
+import com.hugsy.customorm.QueryBuilder;
 
 import java.sql.*;
-import java.util.Arrays;
 
-public class Database {
+/**
+ * Provide a instance to connect to database and execute query
+ */
+public final class Database {
+    private static Database INSTANCE;
     private Connection connection;
     private Statement statement;
+    private QueryBuilder queryBuilder;
 
-    public Database() {
+    private Database() {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String dbURL = "jdbc:sqlserver://localhost:1433;databaseName=social_media;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
             this.connection = DriverManager.getConnection(dbURL);
             if (connection != null) {
-                System.out.println("Connected");
-                this.connection = connection;
+                queryBuilder = new QueryBuilder();
                 this.statement = connection.createStatement();
             }
         } catch (Exception e) {
@@ -25,19 +27,16 @@ public class Database {
         }
     }
 
+    public static Database getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Database();
+        }
+        return INSTANCE;
+    }
+
     public Integer executeQuery(String query) throws SQLException {
         Integer result = statement.executeUpdate(query);
         return result;
-    }
-
-    public boolean tableExistsSQL(String tableName) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT count(*) "
-                + "FROM social_media.tables "
-                + "WHERE table_name = ?;");
-        preparedStatement.setString(1, tableName);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        resultSet.next();
-        return resultSet.getInt(1) != 0;
     }
 
     public boolean tableExist(String tableName) throws SQLException {
@@ -55,41 +54,25 @@ public class Database {
     }
 
     public ResultSet findById(Class<?> c, Long id, String... fields) throws SQLException {
-        String query = "Select " + getFields(fields) + " from " + c.getAnnotation(Table.class).name() +
-                " where " + getIdFieldName(c) + " = " + id;
-        ResultSet resultSet = statement.executeQuery(query);
+        ResultSet resultSet = statement.executeQuery(queryBuilder.findById(c, id, fields));
         return resultSet;
     }
 
-    public ResultSet findAll(Class<?> c) throws SQLException {
-        String query = "Select * from " + c.getAnnotation(Table.class).name();
-        return statement.executeQuery(query);
+    public ResultSet findByFk(Class<?> c, String fkColumn, Long fkId, String... fields) throws SQLException {
+        ResultSet resultSet = statement.executeQuery(queryBuilder.findByFk(c, fkColumn, fkId, fields));
+        return resultSet;
+    }
+
+    public ResultSet findAll(Class<?> c, String... fields) throws SQLException {
+        return statement.executeQuery(queryBuilder.findAll(c, fields));
     }
 
     public void deleteById(Class<?> c, Long id) throws SQLException {
-        String query = "delete from " + c.getAnnotation(Table.class).name() +
-                " where " + getIdFieldName(c) + " = " + id;
-        statement.executeUpdate(query);
+        statement.executeUpdate(queryBuilder.deleteById(c, id));
     }
 
     public void deleteByFk(Class<?> c, String fkColumn, Long fkId) throws SQLException {
-        String query = "delete from " + c.getAnnotation(Table.class).name() +
-                " where " + fkColumn + " = " + fkId;
-        statement.executeUpdate(query);
+        statement.executeUpdate(queryBuilder.deleteByFk(c, fkColumn, fkId));
     }
-
-    String getIdFieldName(Class<?> c) {
-        return Arrays.stream(c.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Id.class)).findFirst().get().getName();
-    }
-
-    String getFields(String... fields) {
-        String result = "";
-        for (String field : fields) {
-            result += field + ",";
-        }
-        return result.substring(0, result.length() - 1);
-    }
-
 
 }
