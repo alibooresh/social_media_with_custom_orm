@@ -9,12 +9,19 @@ import java.util.List;
 
 public class UserService {
     public static User mapUserResult(ResultSet resultSet) throws SQLException {
-        User user = new User();
-
-        while (resultSet.next()) {
-            user.setId(resultSet.getLong("id"));
-            user.setName(resultSet.getString("name"));
-            user.setUsername(resultSet.getString("username"));
+        User user;
+        if (resultSet == null) {
+            user = null;
+        } else {
+            user = new User();
+            while (resultSet.next()) {
+                user.setId(resultSet.getLong("id"));
+                user.setName(resultSet.getString("name"));
+                user.setUsername(resultSet.getString("username"));
+            }
+            if (user.getId() == null) {
+                user = null;
+            }
         }
         return user;
     }

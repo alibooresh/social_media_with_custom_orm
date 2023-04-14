@@ -5,14 +5,13 @@ import com.hugsy.socialmedia.model.Post;
 import com.hugsy.socialmedia.model.User;
 import com.hugsy.socialmedia.service.PostService;
 import com.hugsy.socialmedia.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static org.junit.Assert.assertEquals;
 
 public class SocialMediaQueryTest {
 
@@ -24,9 +23,9 @@ public class SocialMediaQueryTest {
         expectedUser.setName("Jack Nicholson");
         expectedUser.setUsername("jack123");
         User resultUser = UserService.mapUserResult(database.findById(User.class, 1L, "id", "name", "username"));
-        assertEquals(expectedUser.getId(), resultUser.getId());
-        assertEquals(expectedUser.getName(), resultUser.getName());
-        assertEquals(expectedUser.getUsername(), resultUser.getUsername());
+        Assertions.assertEquals(expectedUser.getId(), resultUser.getId());
+        Assertions.assertEquals(expectedUser.getName(), resultUser.getName());
+        Assertions.assertEquals(expectedUser.getUsername(), resultUser.getUsername());
     }
 
     @Test
@@ -44,16 +43,26 @@ public class SocialMediaQueryTest {
         expectedUsers.add(user1);
         expectedUsers.add(user2);
         List<User> actualUsers = UserService.mapUsersResult(database.findAll(User.class));
-        assertEquals(expectedUsers.size(), actualUsers.size());
+        Assertions.assertEquals(expectedUsers.size(), actualUsers.size());
         actualUsers.forEach(actualUser -> {
             expectedUsers.forEach(expectedUser -> {
                 if (Objects.equals(actualUser.getId(), expectedUser.getId())) {
-                    assertEquals(expectedUser.getId(), actualUser.getId());
-                    assertEquals(expectedUser.getName(), actualUser.getName());
-                    assertEquals(expectedUser.getUsername(), actualUser.getUsername());
+                    Assertions.assertEquals(expectedUser.getId(), actualUser.getId());
+                    Assertions.assertEquals(expectedUser.getName(), actualUser.getName());
+                    Assertions.assertEquals(expectedUser.getUsername(), actualUser.getUsername());
                 }
             });
         });
+    }
+
+    @Test
+    public void testDeleteUserById() throws SQLException {
+        Database database = new Database();
+        Long userId = 1L;
+        database.deleteByFk(Post.class, "user_id", userId);
+        database.deleteById(User.class, userId);
+        User user = UserService.mapUserResult(database.findById(User.class, userId, "id", "name", "username"));
+        Assertions.assertNull(user);
     }
 
     @Test
@@ -65,10 +74,10 @@ public class SocialMediaQueryTest {
         expectedPost.setMediaUrl("http://nazdika.com/1");
         expectedPost.setUserId(1L);
         Post resultPost = PostService.mapPostResult(database.findById(Post.class, 1L, "id", "caption", "media_url", "user_id"));
-        assertEquals(expectedPost.getId(), resultPost.getId());
-        assertEquals(expectedPost.getCaption(), resultPost.getCaption());
-        assertEquals(expectedPost.getMediaUrl(), resultPost.getMediaUrl());
-        assertEquals(expectedPost.getUserId(), resultPost.getUserId());
+        Assertions.assertEquals(expectedPost.getId(), resultPost.getId());
+        Assertions.assertEquals(expectedPost.getCaption(), resultPost.getCaption());
+        Assertions.assertEquals(expectedPost.getMediaUrl(), resultPost.getMediaUrl());
+        Assertions.assertEquals(expectedPost.getUserId(), resultPost.getUserId());
     }
 
     @Test
@@ -88,16 +97,24 @@ public class SocialMediaQueryTest {
         expectedPosts.add(post1);
         expectedPosts.add(post2);
         List<Post> actualPosts = PostService.mapPostsResult(database.findAll(Post.class));
-        assertEquals(expectedPosts.size(), actualPosts.size());
+        Assertions.assertEquals(expectedPosts.size(), actualPosts.size());
         actualPosts.forEach(actualPost -> {
             expectedPosts.forEach(expectedPost -> {
                 if (Objects.equals(actualPost.getId(), expectedPost.getId())) {
-                    assertEquals(expectedPost.getId(), actualPost.getId());
-                    assertEquals(expectedPost.getCaption(), actualPost.getCaption());
-                    assertEquals(expectedPost.getMediaUrl(), actualPost.getMediaUrl());
-                    assertEquals(expectedPost.getUserId(), actualPost.getUserId());
+                    Assertions.assertEquals(expectedPost.getId(), actualPost.getId());
+                    Assertions.assertEquals(expectedPost.getCaption(), actualPost.getCaption());
+                    Assertions.assertEquals(expectedPost.getMediaUrl(), actualPost.getMediaUrl());
+                    Assertions.assertEquals(expectedPost.getUserId(), actualPost.getUserId());
                 }
             });
         });
+    }
+
+    @Test
+    public void testDeletePostById() throws SQLException {
+        Database database = new Database();
+        database.deleteById(Post.class, 1L);
+        Post post = PostService.mapPostResult(database.findById(Post.class, 1L, "id", "caption", "media_url", "user_id"));
+        Assertions.assertNull(post);
     }
 }

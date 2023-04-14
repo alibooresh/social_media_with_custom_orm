@@ -9,12 +9,20 @@ import java.util.List;
 
 public class PostService {
     public static Post mapPostResult(ResultSet resultSet) throws SQLException {
-        Post post = new Post();
-        while (resultSet.next()) {
-            post.setId(resultSet.getLong("id"));
-            post.setCaption(resultSet.getString("caption"));
-            post.setMediaUrl(resultSet.getString("media_url"));
-            post.setUserId(resultSet.getLong("user_id"));
+        Post post;
+        if (resultSet == null) {
+            post = null;
+        } else {
+            post = new Post();
+            while (resultSet.next()) {
+                post.setId(resultSet.getLong("id"));
+                post.setCaption(resultSet.getString("caption"));
+                post.setMediaUrl(resultSet.getString("media_url"));
+                post.setUserId(resultSet.getLong("user_id"));
+            }
+            if (post.getId() == null) {
+                post = null;
+            }
         }
         return post;
     }

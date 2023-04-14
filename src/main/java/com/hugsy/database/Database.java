@@ -57,7 +57,8 @@ public class Database {
     public ResultSet findById(Class<?> c, Long id, String... fields) throws SQLException {
         String query = "Select " + getFields(fields) + " from " + c.getAnnotation(Table.class).name() +
                 " where " + getIdFieldName(c) + " = " + id;
-        return statement.executeQuery(query);
+        ResultSet resultSet = statement.executeQuery(query);
+        return resultSet;
     }
 
     public ResultSet findAll(Class<?> c) throws SQLException {
@@ -71,9 +72,9 @@ public class Database {
         statement.executeUpdate(query);
     }
 
-    public void deleteByFk(Class<?> c, Long id) throws SQLException {
+    public void deleteByFk(Class<?> c, String fkColumn, Long fkId) throws SQLException {
         String query = "delete from " + c.getAnnotation(Table.class).name() +
-                "where " + getIdFieldName(c) + " = " + id;
+                " where " + fkColumn + " = " + fkId;
         statement.executeUpdate(query);
     }
 
