@@ -66,6 +66,11 @@ public class UserService {
         return postService.getUserPosts(userId);
     }
 
+    public void deleteUser(Long id) {
+        jedis = new Jedis();
+        jedis.hdel(USER_PREFIX, id.toString());
+    }
+
     public static User mapUserResult(ResultSet resultSet) throws SQLException {
         User user;
         if (resultSet == null) {

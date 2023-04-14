@@ -65,6 +65,11 @@ public class PostService {
         return posts;
     }
 
+    public void deletePost(Long id) {
+        jedis = new Jedis();
+        jedis.hdel(POST_PREFIX, id.toString());
+    }
+
     public static Post mapPostResult(ResultSet resultSet) throws SQLException {
         Post post;
         if (resultSet == null) {
