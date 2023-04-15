@@ -23,7 +23,7 @@ public final class Database {
                 this.statement = connection.createStatement();
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
     }
 
@@ -34,11 +34,24 @@ public final class Database {
         return INSTANCE;
     }
 
-    public Integer executeQuery(String query) throws SQLException {
-        Integer result = statement.executeUpdate(query);
-        return result;
+    /**
+     * Run a create table query to create given table(c)
+     *
+     * @param c class of database table to get table name
+     * @return either (1) the row count for SQL (DML) statements or (2) 0 for SQL statements that return nothing
+     * @throws SQLException throws an SQL Exception
+     */
+    public Integer createTable(Class<?> c) throws SQLException {
+        return statement.executeUpdate(queryBuilder.createTable(c));
     }
 
+    /**
+     * Check existence of given table name
+     *
+     * @param tableName table name to check
+     * @return true if the given table exist, false otherwise
+     * @throws SQLException throws an SQL Exception
+     */
     public boolean tableExist(String tableName) throws SQLException {
         boolean tExists = false;
         try (ResultSet rs = this.connection.getMetaData().getTables(null, null, tableName, null)) {
@@ -53,24 +66,64 @@ public final class Database {
         return tExists;
     }
 
+    /**
+     * Return a ResultSet of given columns(fields) from given table name (c) with specified id
+     *
+     * @param c      class of database table to get table name
+     * @param id     id to load
+     * @param fields columns to load
+     * @return ResultSet
+     * @throws SQLException throws an SQL Exception
+     */
     public ResultSet findById(Class<?> c, Long id, String... fields) throws SQLException {
-        ResultSet resultSet = statement.executeQuery(queryBuilder.findById(c, id, fields));
-        return resultSet;
+        return statement.executeQuery(queryBuilder.findById(c, id, fields));
     }
 
+    /**
+     * Return a ResultSet of given columns(fields) from given table name (c) by fkColumn and fkId
+     *
+     * @param c        class of database table to get table name
+     * @param fkColumn foreign key column name
+     * @param fkId     foreign key id
+     * @param fields   columns to load
+     * @return A resultSet
+     * @throws SQLException throws an SQL Exception
+     */
     public ResultSet findByFk(Class<?> c, String fkColumn, Long fkId, String... fields) throws SQLException {
-        ResultSet resultSet = statement.executeQuery(queryBuilder.findByFk(c, fkColumn, fkId, fields));
-        return resultSet;
+        return statement.executeQuery(queryBuilder.findByFk(c, fkColumn, fkId, fields));
     }
 
+    /**
+     * Gets the table name of class (c) and select all records in database
+     *
+     * @param c      class of database table to get table name
+     * @param fields columns to load
+     * @return a resultSet
+     * @throws SQLException throws an SQL Exception
+     */
     public ResultSet findAll(Class<?> c, String... fields) throws SQLException {
         return statement.executeQuery(queryBuilder.findAll(c, fields));
     }
 
+    /**
+     * Delete a record from the table (c) where id column is id
+     *
+     * @param c  class of database table to get table name
+     * @param id id to delete
+     * @throws SQLException throws an SQL Exception
+     */
     public void deleteById(Class<?> c, Long id) throws SQLException {
         statement.executeUpdate(queryBuilder.deleteById(c, id));
     }
 
+    /**
+     * Delete record(s) from the table (c) where foreign key column is fkColumn
+     *
+     * @param c        class of database table to get table name
+     * @param fkColumn foreign key column name
+     * @param fkId     foreign key id
+     * @throws SQLException throws an SQL Exception
+     */
     public void deleteByFk(Class<?> c, String fkColumn, Long fkId) throws SQLException {
         statement.executeUpdate(queryBuilder.deleteByFk(c, fkColumn, fkId));
     }
